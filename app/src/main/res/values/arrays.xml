@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Hook ONLY System Framework like Hide-My-Applist -->
+    <string-array name="xposed_scope">
+        <item>android</item>
+    </string-array>
+</resources>
