@@ -51,6 +51,39 @@ public class SimSpoofModule implements IXposedHookLoadPackage {
         "de.robv.android.xposed", "org.lsposed", "io.github.lsposed",
         "xposed_init", "XposedBridge", "XposedHelpers", "LSPosed",
         "lspd", "riru", "zygisk"
+    };
+    
+    private static final String[] ROOT_BINARIES = {
+        "su", "busybox", "supersu", "Superuser.apk", "magisk"
+    };
+    
+    // System paths to hide (like Hide-My-Applist)
+    private static final String[] SENSITIVE_PATHS = {
+        "/proc/self/maps", "/proc/self/task", "/proc/self/status",
+        "/system/framework", "/system/bin/app_process", "/data/misc/riru",
+        "/data/adb", "/sbin", "/system/addon.d", "/system/etc/init",
+        "/vendor/bin/hw", "/data/misc/zygisk"
+    };
+
+    @Override
+    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
+        // Hook ONLY System Framework like Hide-My-Applist
+        if (!lpparam.packageName.equals("android")) {
+            return; // Only hook system framework
+        }
+        
+        XposedBridge.log(TAG + ": Hooking System Framework: " + lpparam.packageName);
+        
+        // All hooks applied to system framework for universal coverage
+        hookTelephonyManager(lpparam);
+        hookSubscriptionManager(lpparam);
+        hookSystemFramework(lpparam);
+        hookStringComparisons(lpparam);
+        hookFileOperations(lpparam);
+        hookProcessOperations(lpparam);
+        hookSystemCalls(lpparam);
+        hookRootDetection(lpparam);
+        hookDebuggerDetection(lpparam);
     }
     
     private void hookSystemFramework(XC_LoadPackage.LoadPackageParam lpparam) {
@@ -100,45 +133,7 @@ public class SimSpoofModule implements IXposedHookLoadPackage {
             });
         } catch (Exception e) {
             XposedBridge.log(TAG + ": Error filtering packages: " + e.getMessage());
-        };
-    
-    // Target apps for SIM spoofing (add more as needed)
-    private static final String[] TARGET_APPS = {
-        "com.instagram.android",
-        "com.whatsapp", 
-        "com.facebook.katana",
-        "com.snapchat.android",
-        "com.twitter.android"
-    };
-    
-    private boolean isTargetApp(String packageName) {
-        for (String targetApp : TARGET_APPS) {
-            if (packageName.equals(targetApp)) {
-                return true;
-            }
         }
-        return false;
-    }
-
-    @Override
-    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-        // Hook ONLY System Framework like Hide-My-Applist
-        if (!lpparam.packageName.equals("android")) {
-            return; // Only hook system framework
-        }
-        
-        XposedBridge.log(TAG + ": Hooking System Framework: " + lpparam.packageName);
-        
-        // All hooks applied to system framework for universal coverage
-        hookTelephonyManager(lpparam);
-        hookSubscriptionManager(lpparam);
-        hookSystemFramework(lpparam);
-        hookStringComparisons(lpparam);
-        hookFileOperations(lpparam);
-        hookProcessOperations(lpparam);
-        hookSystemCalls(lpparam);
-        hookRootDetection(lpparam);
-        hookDebuggerDetection(lpparam);
     }
     
     private void hookTelephonyManager(XC_LoadPackage.LoadPackageParam lpparam) {
@@ -514,7 +509,7 @@ public class SimSpoofModule implements IXposedHookLoadPackage {
     
     private void hookSystemCalls(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
-            // Hook Thread.getName to hide Frida threads
+            // Hook Thread.getName to hide detection threads
             XposedHelpers.findAndHookMethod(Thread.class, "getName",
                 new XC_MethodHook() {
                     @Override
