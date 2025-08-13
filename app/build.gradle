@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    namespace 'com.example.simspoof'
-    compileSdk 34
+    namespace "com.example.simspoof"   // <-- используй свой package/namespace
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.example.simspoof"
         minSdk 24
-        targetSdk 34
+        targetSdk 33
         versionCode 1
         versionName "1.0"
     }
@@ -17,9 +17,16 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles(
+                getDefaultProguardFile('proguard-android-optimize.txt'),
+                'proguard-rules.pro'
+            )
+        }
+        debug {
+            // по желанию
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -27,7 +34,7 @@ android {
 }
 
 dependencies {
-    // Xposed Framework API
-    compileOnly 'de.robv.android.xposed:api:82'
-    compileOnly 'de.robv.android.xposed:api:82:sources'
+    // Xposed API — только на этапе компиляции
+    compileOnly "de.robv.android.xposed:api:82"
+    // НЕ добавляй ":sources" к зависимости — иногда ломает резолв
 }
