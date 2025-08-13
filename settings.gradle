@@ -3,14 +3,19 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        // maven { url 'https://jitpack.io' } // добавь, если проект его реально использует
     }
 }
+
 dependencyResolutionManagement {
+    // Жёстко запрещаем репозитории в проектах (чтобы не ловить конфликт)
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
+        // maven { url 'https://jitpack.io' }
     }
 }
+
 rootProject.name = "SimSpoof"
-include ':app'
+include(":app")
