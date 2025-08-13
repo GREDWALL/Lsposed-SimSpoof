@@ -14,26 +14,24 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '11'     # если сборка попросит JDK 17 — поменяй на '17'
+     - uses: actions/setup-java@v4
+  with:
+    distribution: temurin
+    java-version: '17'
 
-      - name: Setup Gradle (installs Gradle if needed)
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: '7.6'  # можно '8.7' для новых проектов
+- uses: gradle/actions/setup-gradle@v3
+  with:
+    gradle-version: '8.2.1'
 
-      # Сгенерировать wrapper, если его нет в репозитории
-      - name: Generate Gradle Wrapper
-        run: |
-          if [ ! -f gradlew ]; then
-            gradle wrapper --gradle-version 7.6
-          fi
-          chmod +x gradlew
+- name: Generate Gradle Wrapper (если его нет в репо)
+  run: |
+    if [ ! -f gradlew ]; then
+      gradle wrapper --gradle-version 8.2.1
+    fi
+    chmod +x gradlew
 
-      - name: Build APK
-        run: ./gradlew assembleRelease
+- name: Build
+  run: ./gradlew assembleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
