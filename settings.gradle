@@ -3,17 +3,17 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
-        // maven { url 'https://jitpack.io' } // добавь, если проект его реально использует
     }
 }
 
 dependencyResolutionManagement {
-    // Жёстко запрещаем репозитории в проектах (чтобы не ловить конфликт)
+    // Централизуем репозитории (иначе будет конфликт с AGP 8.x)
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        // maven { url 'https://jitpack.io' }
+        // Xposed API репозиторий для de.robv.android.xposed:api:82
+        maven { url "https://api.xposed.info" }
     }
 }
 
