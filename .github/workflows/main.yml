@@ -1,0 +1,33 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:   # кнопка "Run workflow" вручную
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # JDK
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'   # если AGP старый – поменяй на '11'
+      # Gradle + кэш
+      - uses: gradle/actions/setup-gradle@v3
+
+      # Сборка APK
+      - name: Assemble release
+        run: ./gradlew assembleRelease
+
+      # Выгрузка APK как артефакт
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
