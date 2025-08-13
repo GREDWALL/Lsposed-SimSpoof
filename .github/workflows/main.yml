@@ -17,12 +17,12 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'   # Gradle 8 требует JDK 17 для запуска
+          java-version: '17'   # Требуется для AGP 8.x
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: '8.2.1'
+          gradle-version: '8.2.1'  # Совместим с AGP 8.1
 
       - name: Generate Gradle Wrapper if missing
         run: |
