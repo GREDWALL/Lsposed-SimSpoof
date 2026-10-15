@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SimSpoof</string>
+    <string name="settings_title">SIM Spoof — Settings</string>
+    <string name="settings_hint">Values apply after you Save and reboot the device.</string>
+
+    <string name="label_iccid">ICCID (SIM serial, 19–20 digits)</string>
+    <string name="label_imsi">IMSI (subscriber id, 15 digits)</string>
+    <string name="label_phone_number">Phone number (Line1, local format)</string>
+    <string name="label_subscriber_number">Subscriber number</string>
+    <string name="label_voice_mail_number">Voicemail number</string>
+    <string name="label_country_iso">Country ISO (2-letter, e.g. US)</string>
+    <string name="label_network_operator">Network operator (MCC+MNC, e.g. 310260)</string>
+    <string name="label_operator_name">Operator name (e.g. T-Mobile)</string>
+    <string name="label_device_id">Device ID / IMEI</string>
+    <string name="label_device_software_version">Device software version</string>
+    <string name="label_group_id_level1">Group ID level 1</string>
+
+    <string name="action_save">Save</string>
+    <string name="action_reset">Reset to defaults</string>
+    <string name="toast_saved">Saved. Reboot the device to apply.</string>
+    <string name="toast_reset">Reset to module defaults.</string>
+</resources>
