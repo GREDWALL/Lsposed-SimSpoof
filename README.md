@@ -144,8 +144,8 @@ private static final String[] DETECTION_STRINGS = {
 
 ### Build Steps
 ```bash
-git clone https://github.com/yourusername/sim-spoof-module
-cd sim-spoof-module
+git clone https://github.com/GREDWALL/Lsposed-SimSpoof
+cd Lsposed-SimSpoof
 ./gradlew assembleRelease
 ```
 
@@ -293,9 +293,9 @@ The developers disclaim any responsibility for misuse or legal consequences.
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/sim-spoof-module/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/sim-spoof-module/discussions)
-- **Documentation**: [Wiki](https://github.com/yourusername/sim-spoof-module/wiki)
+- **Issues**: [GitHub Issues](https://github.com/GREDWALL/Lsposed-SimSpoof/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/GREDWALL/Lsposed-SimSpoof/discussions)
+- **Documentation**: [Wiki](https://github.com/GREDWALL/Lsposed-SimSpoof/wiki)
 
 ---
 
