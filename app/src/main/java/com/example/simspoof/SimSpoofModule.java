@@ -17,33 +17,34 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
+import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class SimSpoofModule implements IXposedHookLoadPackage {
-    
+
     private static final String TAG = "SimSpoof";
-    
-    // Configuration - modify these values as needed
-    private static final String SPOOFED_ICCID = "89860123456789012345";
-    private static final String SPOOFED_IMSI = "310260123456789";
-    private static final String SPOOFED_PHONE_NUMBER = "+1234567890";
-    private static final String SPOOFED_LINE1_NUMBER = "1234567890";
-    private static final String SPOOFED_SUBSCRIBER_NUMBER = "1234567890";
-    private static final String SPOOFED_VOICE_MAIL_NUMBER = "123";
-    
+
+    // Configuration - overridden at runtime from SettingsActivity's prefs; see loadConfig()
+    private static String SPOOFED_ICCID = SimSpoofDefaults.ICCID;
+    private static String SPOOFED_IMSI = SimSpoofDefaults.IMSI;
+    private static String SPOOFED_PHONE_NUMBER = SimSpoofDefaults.PHONE_NUMBER;
+    private static String SPOOFED_LINE1_NUMBER = SimSpoofDefaults.PHONE_NUMBER;
+    private static String SPOOFED_SUBSCRIBER_NUMBER = SimSpoofDefaults.SUBSCRIBER_NUMBER;
+    private static String SPOOFED_VOICE_MAIL_NUMBER = SimSpoofDefaults.VOICE_MAIL_NUMBER;
+
     // Country and Network Information
-    private static final String SPOOFED_COUNTRY_ISO = "US";
-    private static final String SPOOFED_NETWORK_COUNTRY_ISO = "US";
-    private static final String SPOOFED_SIM_COUNTRY_ISO = "US";
-    private static final String SPOOFED_NETWORK_OPERATOR = "310260";  // T-Mobile US
-    private static final String SPOOFED_NETWORK_OPERATOR_NAME = "T-Mobile";
-    private static final String SPOOFED_SIM_OPERATOR = "310260";
-    private static final String SPOOFED_SIM_OPERATOR_NAME = "T-Mobile";
-    
+    private static String SPOOFED_COUNTRY_ISO = SimSpoofDefaults.COUNTRY_ISO;
+    private static String SPOOFED_NETWORK_COUNTRY_ISO = SimSpoofDefaults.COUNTRY_ISO;
+    private static String SPOOFED_SIM_COUNTRY_ISO = SimSpoofDefaults.COUNTRY_ISO;
+    private static String SPOOFED_NETWORK_OPERATOR = SimSpoofDefaults.NETWORK_OPERATOR;
+    private static String SPOOFED_NETWORK_OPERATOR_NAME = SimSpoofDefaults.OPERATOR_NAME;
+    private static String SPOOFED_SIM_OPERATOR = SimSpoofDefaults.NETWORK_OPERATOR;
+    private static String SPOOFED_SIM_OPERATOR_NAME = SimSpoofDefaults.OPERATOR_NAME;
+
     // Device Identifiers
-    private static final String SPOOFED_DEVICE_ID = "123456789012345";  // IMEI
-    private static final String SPOOFED_DEVICE_SOFTWARE_VERSION = "01";
-    private static final String SPOOFED_GROUP_ID_LEVEL1 = "0";
+    private static String SPOOFED_DEVICE_ID = SimSpoofDefaults.DEVICE_ID;
+    private static String SPOOFED_DEVICE_SOFTWARE_VERSION = SimSpoofDefaults.DEVICE_SOFTWARE_VERSION;
+    private static String SPOOFED_GROUP_ID_LEVEL1 = SimSpoofDefaults.GROUP_ID_LEVEL1;
     
     // Detection strings to block (LSPosed/Xposed related)
     private static final String[] DETECTION_STRINGS = {
@@ -71,9 +72,10 @@ public class SimSpoofModule implements IXposedHookLoadPackage {
         if (!lpparam.packageName.equals("android")) {
             return; // Only hook system framework
         }
-        
+
+        loadConfig();
         XposedBridge.log(TAG + ": Hooking System Framework: " + lpparam.packageName);
-        
+
         // All hooks applied to system framework for universal coverage
         hookTelephonyManager(lpparam);
         hookSubscriptionManager(lpparam);
@@ -86,6 +88,55 @@ public class SimSpoofModule implements IXposedHookLoadPackage {
         hookDebuggerDetection(lpparam);
     }
     
+    /**
+     * Reads values saved by {@link SettingsActivity} and overrides the defaults.
+     * Nothing changes if the user never opened the settings screen.
+     */
+    private void loadConfig() {
+        try {
+            XSharedPreferences prefs = new XSharedPreferences(
+                SimSpoofConstants.MODULE_PACKAGE, SimSpoofConstants.PREFS_NAME);
+            prefs.makeWorldReadable();
+            prefs.reload();
+
+            SPOOFED_ICCID = prefs.getString(SimSpoofConstants.KEY_ICCID, SimSpoofDefaults.ICCID);
+            SPOOFED_IMSI = prefs.getString(SimSpoofConstants.KEY_IMSI, SimSpoofDefaults.IMSI);
+
+            String phoneNumber = prefs.getString(SimSpoofConstants.KEY_PHONE_NUMBER, SimSpoofDefaults.PHONE_NUMBER);
+            SPOOFED_PHONE_NUMBER = phoneNumber;
+            SPOOFED_LINE1_NUMBER = phoneNumber;
+            SPOOFED_SUBSCRIBER_NUMBER = prefs.getString(
+                SimSpoofConstants.KEY_SUBSCRIBER_NUMBER, SimSpoofDefaults.SUBSCRIBER_NUMBER);
+            SPOOFED_VOICE_MAIL_NUMBER = prefs.getString(
+                SimSpoofConstants.KEY_VOICE_MAIL_NUMBER, SimSpoofDefaults.VOICE_MAIL_NUMBER);
+
+            String countryIso = prefs.getString(SimSpoofConstants.KEY_COUNTRY_ISO, SimSpoofDefaults.COUNTRY_ISO);
+            SPOOFED_COUNTRY_ISO = countryIso;
+            SPOOFED_NETWORK_COUNTRY_ISO = countryIso;
+            SPOOFED_SIM_COUNTRY_ISO = countryIso;
+
+            String networkOperator = prefs.getString(
+                SimSpoofConstants.KEY_NETWORK_OPERATOR, SimSpoofDefaults.NETWORK_OPERATOR);
+            SPOOFED_NETWORK_OPERATOR = networkOperator;
+            SPOOFED_SIM_OPERATOR = networkOperator;
+
+            String operatorName = prefs.getString(
+                SimSpoofConstants.KEY_OPERATOR_NAME, SimSpoofDefaults.OPERATOR_NAME);
+            SPOOFED_NETWORK_OPERATOR_NAME = operatorName;
+            SPOOFED_SIM_OPERATOR_NAME = operatorName;
+
+            SPOOFED_DEVICE_ID = prefs.getString(SimSpoofConstants.KEY_DEVICE_ID, SimSpoofDefaults.DEVICE_ID);
+            SPOOFED_DEVICE_SOFTWARE_VERSION = prefs.getString(
+                SimSpoofConstants.KEY_DEVICE_SOFTWARE_VERSION, SimSpoofDefaults.DEVICE_SOFTWARE_VERSION);
+            SPOOFED_GROUP_ID_LEVEL1 = prefs.getString(
+                SimSpoofConstants.KEY_GROUP_ID_LEVEL1, SimSpoofDefaults.GROUP_ID_LEVEL1);
+
+            XposedBridge.log(TAG + ": Loaded configuration saved from the module's Settings screen");
+        } catch (Exception e) {
+            XposedBridge.log(TAG + ": No saved settings found, using built-in defaults: " + e.getMessage());
+        }
+    }
+
     private void hookSystemFramework(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
             // Hook PackageManagerService like Hide-My-Applist

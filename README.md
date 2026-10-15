@@ -9,6 +9,7 @@ This module is for educational and research purposes only. Users are responsible
 ## 🚀 Features
 
 ### SIM Card Spoofing
+- **Settings Screen**: Edit spoofed values from the app's own UI, no rebuild needed
 - **ICCID Spoofing**: Replace SIM serial number with custom values
 - **IMSI Spoofing**: Modify subscriber ID (IMSI)
 - **Phone Number Spoofing**: Change Line1 number and subscriber number
@@ -76,33 +77,29 @@ The module follows Hide-My-Applist's approach by hooking **ONLY** the System Fra
 
 ## ⚙️ Configuration
 
-### SIM Spoofing Values
-Edit the following constants in the source code before building:
+### SIM Spoofing Values — via Settings screen (recommended)
+The module app now has a launcher icon and a **Settings** screen
+(`SettingsActivity`). Open the app, edit the fields, tap **Save**, then
+reboot the device for the hooks to pick up the new values. Values are
+stored in the app's own `SharedPreferences` (`simspoof_prefs`) and read
+back at hook time via `XSharedPreferences` — no rebuild required.
+
+If you never open Settings, the module falls back to the built-in
+defaults in `SimSpoofDefaults.java` (the same values previously hardcoded
+directly in `SimSpoofModule.java`):
 
 ```java
-// === SIM Card Information ===
-private static final String SPOOFED_ICCID = "89860123456789012345";  // 19-20 digits
-private static final String SPOOFED_IMSI = "310260123456789";         // 15 digits
-
-// === Phone Number Information ===
-private static final String SPOOFED_PHONE_NUMBER = "+1234567890";     // International format
-private static final String SPOOFED_LINE1_NUMBER = "1234567890";      // Local format
-private static final String SPOOFED_SUBSCRIBER_NUMBER = "1234567890";
-private static final String SPOOFED_VOICE_MAIL_NUMBER = "123";
-
-// === Country and Network Information ===
-private static final String SPOOFED_COUNTRY_ISO = "US";               // 2-letter country code
-private static final String SPOOFED_NETWORK_COUNTRY_ISO = "US";
-private static final String SPOOFED_SIM_COUNTRY_ISO = "US";
-private static final String SPOOFED_NETWORK_OPERATOR = "310260";      // MCC+MNC (T-Mobile US)
-private static final String SPOOFED_NETWORK_OPERATOR_NAME = "T-Mobile";
-private static final String SPOOFED_SIM_OPERATOR = "310260";
-private static final String SPOOFED_SIM_OPERATOR_NAME = "T-Mobile";
-
-// === Device Information ===
-private static final String SPOOFED_DEVICE_ID = "123456789012345";    // IMEI (15 digits)
-private static final String SPOOFED_DEVICE_SOFTWARE_VERSION = "01";
-private static final String SPOOFED_GROUP_ID_LEVEL1 = "0";
+ICCID = "89860123456789012345";       // 19-20 digits
+IMSI = "310260123456789";             // 15 digits
+PHONE_NUMBER = "1234567890";          // used for Line1 number and subscriber number
+SUBSCRIBER_NUMBER = "1234567890";
+VOICE_MAIL_NUMBER = "123";
+COUNTRY_ISO = "US";                   // 2-letter country code, applied to SIM/network ISO too
+NETWORK_OPERATOR = "310260";          // MCC+MNC, applied to SIM operator too
+OPERATOR_NAME = "T-Mobile";           // applied to SIM operator name too
+DEVICE_ID = "123456789012345";        // IMEI (15 digits)
+DEVICE_SOFTWARE_VERSION = "01";
+GROUP_ID_LEVEL1 = "0";
 ```
 
 ### Common Country/Operator Combinations:
@@ -117,13 +114,7 @@ private static final String SPOOFED_GROUP_ID_LEVEL1 = "0";
 | Canada | CA | 30272 | Rogers | 302721234567890 |
 
 ### Target Apps
-**No manual app targeting needed!** The module hooks only the system framework, which automatically covers all apps. Simply modify the ICCID/IMSI values:
-
-```java
-// Customize these values
-private static final String SPOOFED_ICCID = "89860123456789012345";
-private static final String SPOOFED_IMSI = "310260123456789";
-```
+**No manual app targeting needed!** The module hooks only the system framework, which automatically covers all apps. Just set the ICCID/IMSI in the Settings screen (see above) and reboot.
 
 ### Detection Strings
 Customize detection strings to block:

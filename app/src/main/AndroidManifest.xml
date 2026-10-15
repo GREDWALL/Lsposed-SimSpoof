@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <application android:label="SimSpoof">
+    <application android:label="@string/app_name">
         <!-- Xposed метаданные для классического API -->
         <meta-data
             android:name="xposedmodule"
@@ -12,6 +12,16 @@
         <meta-data
             android:name="xposeddescription"
             android:value="SIM/Telephony spoof test module for LSPosed/Xposed" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/settings_title"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
